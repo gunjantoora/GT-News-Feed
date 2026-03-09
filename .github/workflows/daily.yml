@@ -25,16 +25,13 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Check secrets exist
-        run: |
-          echo "GNEWS set: ${{ secrets.GNEWS_API_KEY != '' }}"
-          echo "ANTHROPIC set: ${{ secrets.ANTHROPIC_API_KEY != '' }}"
-
       - name: Generate news feed
         env:
           GNEWS_API_KEY: ${{ secrets.GNEWS_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: python main.py
+        run: |
+          python -c "import os; print('GNEWS_API_KEY present:', 'GNEWS_API_KEY' in os.environ); print('ANTHROPIC_API_KEY present:', 'ANTHROPIC_API_KEY' in os.environ)"
+          python main.py
 
       - name: Commit and push index.html
         run: |
