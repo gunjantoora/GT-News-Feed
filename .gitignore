@@ -1,0 +1,5 @@
+*.pyc
+__pycache__/
+index.html
+.env
+env_vars.env
