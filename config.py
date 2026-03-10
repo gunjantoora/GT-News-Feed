@@ -52,11 +52,7 @@ SECTIONS = [
         "title": "Positive News",
         "fetch_type": "search",
         "params": {
-            "q": (
-                "scientific breakthrough humanity OR conservation win species restored OR"
-                " women leading science politics OR clean energy milestone OR"
-                " community poverty education solution"
-            ),
+            "q": "conservation OR breakthrough OR restoration OR milestone OR achievement",
             "lang": "en",
             "max": 5,
         },
@@ -103,11 +99,7 @@ SECTIONS = [
         "title": "Tech & AI",
         "fetch_type": "search",
         "params": {
-            "q": (
-                "artificial intelligence OR LLM OR large language model OR"
-                " machine learning OR deep learning OR OpenAI OR Anthropic OR"
-                " computer science OR AI policy OR AI research"
-            ),
+            "q": "artificial intelligence OR machine learning OR LLM OR OpenAI OR Anthropic",
             "lang": "en",
             "max": 8,
         },
