@@ -1,5 +1,19 @@
+import random
 import anthropic
 from config import ANTHROPIC_API_KEY, CLAUDE_MODEL, SECTIONS
+
+THOUGHT_TOPICS = [
+    "an ancient civilization or forgotten culture",
+    "a rare or strange natural phenomenon",
+    "a philosophical paradox or thought experiment",
+    "an overlooked or forgotten historical figure",
+    "a counterintuitive finding from science or psychology",
+    "the concept of slow living or deep attention",
+    "an unusual human habit or ritual from history or culture",
+    "the nature of time, memory, or consciousness",
+    "a deep story from the natural world",
+    "a lesson hidden in an everyday object or practice",
+]
 
 client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
@@ -76,41 +90,6 @@ def summarize_section(section_id: str, section_title: str, articles: list) -> li
             "summary": summary or article.get("description") or "",
         })
     return enriched
-
-
-def evaluate_quote(quote: dict) -> dict:
-    """
-    Check if the ZenQuotes quote is shallow/generic. If so, ask Claude for a better one.
-    Returns the original or a replacement quote dict with 'text' and 'author' keys.
-    """
-    prompt = (
-        f"Here is today's quote:\n\"{quote['text']}\" — {quote['author']}\n\n"
-        "Is this quote intellectually interesting, thought-provoking, or slightly uncomfortable in a good way? "
-        "Or is it generic, motivational-poster-level, or LinkedIn-style?\n\n"
-        "If it's good, reply with just: KEEP\n"
-        "If it's generic, reply with a better quote from a Stoic philosopher, Dostoevsky, Kafka, Feynman, "
-        "or another sharp historical mind. Format exactly as:\n"
-        "REPLACE: \"<quote text>\" — <Author Name>"
-    )
-    try:
-        message = client.messages.create(
-            model=CLAUDE_MODEL,
-            max_tokens=150,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        response = message.content[0].text.strip()
-        if response.startswith("REPLACE:"):
-            parts = response[len("REPLACE:"):].strip()
-            # Parse: "quote text" — Author Name
-            if "\" —" in parts:
-                text_part, author_part = parts.rsplit("\" —", 1)
-                text = text_part.strip().lstrip('"')
-                author = author_part.strip()
-                print(f"[quote] Replaced with: {author}")
-                return {"text": text, "author": author}
-    except Exception as e:
-        print(f"[quote] Evaluation failed: {e}")
-    return quote
 
 
 def summarize_all(sections_data: dict) -> dict:

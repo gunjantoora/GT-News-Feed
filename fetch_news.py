@@ -1,27 +1,41 @@
 import time
 import requests
 import random
-from config import GNEWS_API_KEY, GNEWS_BASE, ZENQUOTES_URL, SECTIONS
+from datetime import datetime, timezone, timedelta
+from config import GNEWS_API_KEY, GNEWS_BASE, QUOTE_URL, SECTIONS
 
-INDIA_EXCLUDE_KEYWORDS = {
-    "bollywood", "cricket", "ipl", "celebrity", "actor", "actress",
-    "film", "movie", "box office", "wicket", "batting", "bowling",
-    "odi", "t20", "test match", "entertainment", "gossip", "bigg boss",
-    "reality show", "serial", "tv show",
+EXCLUDE_KEYWORDS = {
+    # Sports
+    "cricket", "ipl", "football", "soccer", "tennis", "basketball", "nba", "nfl", "nhl",
+    "formula 1", "f1", "grand prix", "olympics", "fifa", "uefa", "premier league",
+    "wicket", "batting", "bowling", "odi", "t20", "test match", "scorecard",
+    "match result", "tournament", "championship", "league table",
+    # Entertainment / celebrity
+    "bollywood", "celebrity", "actor", "actress", "film", "movie", "box office",
+    "entertainment", "gossip", "bigg boss", "reality show", "serial", "tv show",
+    # Clickbait / sensationalist
+    "you won't believe", "shocking", "mind-blowing", "goes viral", "twitter reacts",
+    "breaks the internet", "slams", "destroys", "obliterates",
 }
 
 
 def fetch_quote():
-    """Fetch today's motivational quote from ZenQuotes."""
+    """Fetch a random quote from quotable.io (famous people across history, science, culture)."""
     try:
-        resp = requests.get(ZENQUOTES_URL, timeout=10)
+        resp = requests.get(QUOTE_URL, timeout=10)
         resp.raise_for_status()
         data = resp.json()
         if data:
-            return {"text": data[0]["q"], "author": data[0]["a"]}
+            return {"text": data[0]["content"], "author": data[0]["author"]}
     except Exception as e:
         print(f"[quote] Failed: {e}")
     return {"text": "The journey of a thousand miles begins with a single step.", "author": "Lao Tzu"}
+
+
+def _48h_from() -> str:
+    """Return ISO timestamp for 48 hours ago, for GNews 'from' param."""
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=48)
+    return cutoff.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _fetch_articles(section: dict) -> list:
@@ -29,6 +43,8 @@ def _fetch_articles(section: dict) -> list:
     fetch_type = section["fetch_type"]  # "search" or "top-headlines"
     params = dict(section["params"])
     params["apikey"] = GNEWS_API_KEY
+    if fetch_type == "search" and section.get("mode") != "thought":
+        params["from"] = _48h_from()  # only articles from last 48 hours (thought section is timeless)
 
     url = f"{GNEWS_BASE}/{fetch_type}"
 
@@ -46,12 +62,12 @@ def _fetch_articles(section: dict) -> list:
         return []
 
 
-def _filter_india(articles: list) -> list:
-    """Remove entertainment/cricket/celebrity articles from India news."""
+def _filter_articles(articles: list) -> list:
+    """Remove sports, entertainment, and celebrity articles from any section."""
     filtered = []
     for a in articles:
         text = ((a.get("title") or "") + " " + (a.get("description") or "")).lower()
-        if not any(kw in text for kw in INDIA_EXCLUDE_KEYWORDS):
+        if not any(kw in text for kw in EXCLUDE_KEYWORDS):
             filtered.append(a)
     return filtered
 
@@ -67,8 +83,7 @@ def fetch_all_sections() -> dict:
         articles = _fetch_articles(section)
         max_items = section.get("max_items", 3)
 
-        if section["id"] == "india":
-            articles = _filter_india(articles)
+        articles = _filter_articles(articles)
 
         if section.get("mode") == "thought":
             results[section["id"]] = [random.choice(articles)] if articles else []

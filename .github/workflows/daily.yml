@@ -29,9 +29,7 @@ jobs:
         env:
           GNEWS_API_KEY: ${{ secrets.GNEWS_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: |
-          python -c "import os; print('GNEWS_API_KEY present:', 'GNEWS_API_KEY' in os.environ); print('ANTHROPIC_API_KEY present:', 'ANTHROPIC_API_KEY' in os.environ)"
-          python main.py
+        run: python main.py
 
       - name: Commit and push index.html
         run: |

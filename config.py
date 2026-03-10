@@ -11,8 +11,8 @@ ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 # --- GNews base URL ---
 GNEWS_BASE = "https://gnews.io/api/v4"
 
-# --- ZenQuotes URL ---
-ZENQUOTES_URL = "https://zenquotes.io/api/today"
+# --- Quote API (quotable.io — free, no key, quotes from famous people across history/culture/science) ---
+QUOTE_URL = "https://api.quotable.io/quotes/random?minLength=60&maxLength=200"
 
 # --- Claude model ---
 CLAUDE_MODEL = "claude-haiku-4-5-20251001"  # cheapest model to minimize token cost
@@ -25,18 +25,18 @@ SECTIONS = [
         "title": "Positive News",
         "fetch_type": "search",
         "params": {
-            "q": "conservation win OR scientific breakthrough OR clean energy milestone OR women leading OR community solution",
+            "q": "breakthrough OR conservation OR achievement OR innovation OR restored",
             "lang": "en",
             "max": 5,
         },
-        "max_items": 3,
+        "max_items": 1,
     },
     {
         "id": "world",
         "title": "World News",
-        "fetch_type": "top-headlines",
+        "fetch_type": "search",
         "params": {
-            "category": "world",
+            "q": "geopolitics OR war OR diplomacy OR sanctions OR election OR health crisis OR disaster OR famine OR treaty",
             "lang": "en",
             "max": 5,
         },
@@ -96,17 +96,5 @@ SECTIONS = [
             "max": 5,
         },
         "max_items": 3,
-    },
-    {
-        "id": "thought",
-        "title": "Thought of the Day",
-        "fetch_type": "search",
-        "params": {
-            "q": "ancient civilization OR philosophical paradox OR counterintuitive science OR forgotten history OR rare phenomenon",
-            "lang": "en",
-            "max": 10,
-        },
-        "max_items": 1,
-        "mode": "thought",  # special rendering mode — title + 2-line desc + link, no AI summary
     },
 ]
