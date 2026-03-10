@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this project does
 
-Generates a daily personal newsfeed (`index.html`) hosted on GitHub Pages. Runs via GitHub Actions cron daily at 00:30 UTC (6am IST). Fetches news from GNews API, a quote from quotable.io, summarizes articles with Claude AI, and renders a static HTML page.
+Generates a daily personal newsfeed (`index.html`) hosted on GitHub Pages. Runs via GitHub Actions cron daily at 11:00 UTC (6am CDT / 7am CST). Fetches news from GNews API, a quote from quotable.io, summarizes articles with Claude AI, and renders a static HTML page.
 
 ## Running the project
 

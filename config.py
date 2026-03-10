@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -17,6 +18,32 @@ QUOTE_URL = "https://api.quotable.io/quotes/random?minLength=60&maxLength=200"
 # --- Claude model ---
 CLAUDE_MODEL = "claude-haiku-4-5-20251001"  # cheapest model to minimize token cost
 
+# --- Thought of the Day: daily theme rotation (history, nature, philosophy, science, culture) ---
+_THOUGHT_THEMES = [
+    {
+        "label": "history",
+        "q": "ancient civilization OR archaeological discovery OR forgotten history OR historical mystery OR lost empire",
+    },
+    {
+        "label": "nature",
+        "q": "wildlife behavior OR ocean discovery OR rare species OR natural phenomenon OR animal intelligence",
+    },
+    {
+        "label": "philosophy",
+        "q": "philosophy consciousness OR thought experiment OR philosophical paradox OR ethics humanity OR meaning existence",
+    },
+    {
+        "label": "science",
+        "q": "scientific discovery OR quantum physics OR space exploration OR neuroscience OR cosmology OR mathematics",
+    },
+    {
+        "label": "culture",
+        "q": "cultural history OR anthropology OR human tradition OR ancient ritual OR art history OR civilization",
+    },
+]
+
+_today_theme = _THOUGHT_THEMES[datetime.now().timetuple().tm_yday % len(_THOUGHT_THEMES)]
+
 # --- Feed sections ---
 # Each section: name, fetch_type, and type-specific params
 SECTIONS = [
@@ -25,7 +52,11 @@ SECTIONS = [
         "title": "Positive News",
         "fetch_type": "search",
         "params": {
-            "q": "breakthrough OR conservation OR achievement OR innovation OR restored",
+            "q": (
+                "scientific breakthrough humanity OR conservation win species restored OR"
+                " women leading science politics OR clean energy milestone OR"
+                " community poverty education solution"
+            ),
             "lang": "en",
             "max": 5,
         },
@@ -45,11 +76,14 @@ SECTIONS = [
     {
         "id": "india",
         "title": "India News",
-        "fetch_type": "top-headlines",
+        "fetch_type": "search",
         "params": {
-            "country": "in",
+            "q": (
+                "India policy OR India economy OR India startup OR India science OR"
+                " India environment OR India space OR India social OR India government"
+            ),
             "lang": "en",
-            "max": 5,
+            "max": 8,
         },
         "max_items": 3,
     },
@@ -67,11 +101,15 @@ SECTIONS = [
     {
         "id": "tech",
         "title": "Tech & AI",
-        "fetch_type": "top-headlines",
+        "fetch_type": "search",
         "params": {
-            "category": "technology",
+            "q": (
+                "artificial intelligence OR LLM OR large language model OR"
+                " machine learning OR deep learning OR OpenAI OR Anthropic OR"
+                " computer science OR AI policy OR AI research"
+            ),
             "lang": "en",
-            "max": 5,
+            "max": 8,
         },
         "max_items": 3,
     },
@@ -96,5 +134,17 @@ SECTIONS = [
             "max": 5,
         },
         "max_items": 3,
+    },
+    {
+        "id": "thought",
+        "title": "Thought of the Day",
+        "fetch_type": "search",
+        "mode": "thought",
+        "params": {
+            "q": _today_theme["q"],
+            "lang": "en",
+            "max": 10,
+        },
+        "max_items": 1,
     },
 ]
